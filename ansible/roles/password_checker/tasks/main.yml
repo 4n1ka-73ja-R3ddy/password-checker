@@ -4,12 +4,26 @@
 # Configures Linux environment, installs Java 17, and runs the Spring Boot service
 # ==============================================================================
 
-- name: Update apt cache and install Java 17 JRE
+- name: Update apt cache and install Java 17 and Maven
   ansible.builtin.apt:
-    name: "{{ java_package }}"
+    name:
+      - "{{ java_package }}"
+      - maven
+      - openjdk-17-jdk-headless
     state: present
     update_cache: yes
   when: ansible_os_family == "Debian"
+
+- name: Check if application JAR file exists
+  ansible.builtin.stat:
+    path: "{{ app_jar_source }}"
+  register: jar_stat
+
+- name: Build Spring Boot JAR with Maven if missing
+  ansible.builtin.command:
+    cmd: mvn clean package -DskipTests
+    chdir: "{{ playbook_dir }}/.."
+  when: not jar_stat.stat.exists
 
 - name: Create application service group
   ansible.builtin.group:
@@ -69,4 +83,3 @@
   until: health_check.status == 200
   retries: 12
   delay: 5
-
