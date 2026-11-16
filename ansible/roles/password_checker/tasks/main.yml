@@ -1,0 +1,72 @@
+---
+# ==============================================================================
+# Tasks for Ansible Role: password_checker
+# Configures Linux environment, installs Java 17, and runs the Spring Boot service
+# ==============================================================================
+
+- name: Update apt cache and install Java 17 JRE
+  ansible.builtin.apt:
+    name: "{{ java_package }}"
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Create application service group
+  ansible.builtin.group:
+    name: "{{ app_group }}"
+    state: present
+    system: yes
+
+- name: Create application service user
+  ansible.builtin.user:
+    name: "{{ app_user }}"
+    group: "{{ app_group }}"
+    shell: /usr/sbin/nologin
+    create_home: no
+    system: yes
+    state: present
+
+- name: Create application deployment directory
+  ansible.builtin.file:
+    path: "{{ app_install_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+
+- name: Copy built Spring Boot JAR file to target server
+  ansible.builtin.copy:
+    src: "{{ app_jar_source }}"
+    dest: "{{ app_install_dir }}/{{ app_jar_name }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0750'
+  notify: Restart password-checker
+
+- name: Deploy systemd service unit file from Jinja2 template
+  ansible.builtin.template:
+    src: password-checker.service.j2
+    dest: "/etc/systemd/system/{{ app_name }}.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Reload systemd daemon
+    - Restart password-checker
+
+- name: Ensure systemd service is started and enabled on boot
+  ansible.builtin.systemd:
+    name: "{{ app_name }}"
+    state: started
+    enabled: yes
+
+- name: Wait for API health endpoint to become ready
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ app_port }}/api/health"
+    status_code: 200
+    return_content: yes
+  register: health_check
+  until: health_check.status == 200
+  retries: 12
+  delay: 5
+

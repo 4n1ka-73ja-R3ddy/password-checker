@@ -1,0 +1,11 @@
+.git
+.gitignore
+.idea
+.vscode
+target/
+*.md
+repo_link.txt
+ansible/
+k8s/
+Jenkinsfile
+
