@@ -1,0 +1,4 @@
+# Password Strength Checker & DevOps Assignment - Source Repository Link
+# Replace the URL below with your actual GitHub or GitLab repository URL:
+https://github.com/YOUR_GITHUB_USERNAME/password-strength-checker
+

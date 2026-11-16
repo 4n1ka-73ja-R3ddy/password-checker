@@ -1,0 +1,24 @@
+---
+# ==============================================================================
+# Ansible Playbook: Deploy Password Strength Checker as a Systemd Service
+# ==============================================================================
+
+- name: Configure Server and Deploy Password Strength Checker API
+  hosts: app_servers
+  become: yes
+  gather_facts: yes
+
+  vars:
+    # Explicit variables demonstrating configuration customization
+    app_name: password-checker
+    app_port: 8080
+    app_user: appuser
+    app_group: appuser
+    app_install_dir: /opt/password-checker
+    app_jar_name: password-checker-0.0.1-SNAPSHOT.jar
+    app_jar_source: "{{ playbook_dir }}/../target/{{ app_jar_name }}"
+    java_package: openjdk-17-jre-headless
+
+  roles:
+    - role: password_checker
+

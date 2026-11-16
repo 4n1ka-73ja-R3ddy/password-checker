@@ -1,0 +1,16 @@
+---
+# ==============================================================================
+# Handlers for Ansible Role: password_checker
+# Restarts service only when JAR or service unit configuration changes
+# ==============================================================================
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Restart password-checker
+  ansible.builtin.service:
+    name: "{{ app_name }}"
+    state: restarted
+    enabled: yes
+
