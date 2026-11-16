@@ -9,9 +9,11 @@ A lightweight Spring Boot REST API for password strength evaluation and actionab
 
 ---
 
+
+
 ## 1. Project Overview
 
-- **Project Title:** Password Strength Checker and Improvement Suggestion API
+- **Project Title:** Password Strength of the  Checker and Improvement Suggestion API
 - **Technology Stack:** Java 17, Spring Boot 3.2.5, Maven, JUnit 5, SpringDoc OpenAPI (Swagger UI)
 - **DevOps Tools:** Git, GitHub, Jenkins, Ansible, Docker, Kubernetes (Minikube / Kind)
 - **Architecture:** Backend-only REST API; no database required.
